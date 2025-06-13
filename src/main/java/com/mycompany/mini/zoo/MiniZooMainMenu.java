@@ -4,9 +4,15 @@
  */
 package com.mycompany.mini.zoo;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -17,6 +23,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -24,7 +31,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 /**
  *
  * @author mierd
@@ -128,11 +137,42 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnActionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActionActionPerformed
+        String openingText = "Cargando...";
+        JLabel openingLabel = new JLabel(openingText);
+        openingLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        openingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        openingLabel.setVerticalAlignment(SwingConstants.CENTER);
+        
+        //declaracion de los JPanel
+        JPanel panelOpening = new JPanel(new BorderLayout());
         JPanel panelLoading = new JPanel();
         JPanel panel = new JPanel();
+        
+        panelOpening.setPreferredSize(new Dimension(550, 600));
+        panelOpening.setMinimumSize(new Dimension(550, 600));
+        panelOpening.setMaximumSize(new Dimension(550, Short.MAX_VALUE));
+        
+        panelOpening.add(openingLabel, BorderLayout.CENTER);
+        
+        JDialog dialogOpening = new JDialog();
         JDialog dialog = new JDialog();
-        dialog.setModal(true);
-        dialog.setTitle("Tu animal interior");
+        
+        dialogOpening.setModal(false);
+        dialogOpening.setTitle("Tu animal interior");
+        dialogOpening.getContentPane().add(panelOpening);
+        dialogOpening.pack();
+        dialogOpening.setLocationRelativeTo(null);
+        dialogOpening.setVisible(true);
+        
+        Timer cierreAutomatico = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialogOpening.dispose();
+            }
+        });
+        cierreAutomatico.setRepeats(false); // Solo una vez
+        cierreAutomatico.start();
+        
         try {
             //buscar siluetas de animales y pedir a la IA una transicion con gif
             String loadingText = "Analizando...";
@@ -140,15 +180,23 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
             URL gifURL = new URL("https://juanxxiiizoo.infinityfreeapp.com/img/animalees.gif");
             ImageIcon originalGif = new ImageIcon(gifURL);
             JLabel loadingGifLabel = new JLabel(originalGif);
-            panelLoading.setPreferredSize(new Dimension(550, 600));
-            panelLoading.setMinimumSize(new Dimension(550, 600));
-            panelLoading.setMaximumSize(new Dimension(550, Short.MAX_VALUE));
             panelLoading.setLayout(new BoxLayout(panelLoading, BoxLayout.Y_AXIS));  
             loadingTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             loadingGifLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             
+            //estilo para los labels
+            loadingTextLabel.setFont(new Font("Arial", Font.BOLD, 22));
+            loadingTextLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 15));
+            
+            //preparar ventana de carga
+            panelLoading.setPreferredSize(new Dimension(550, 600));
+            panelLoading.setMinimumSize(new Dimension(550, 600));
+            panelLoading.setMaximumSize(new Dimension(550, Short.MAX_VALUE));
+            
             panelLoading.add(loadingTextLabel);
             panelLoading.add(loadingGifLabel);
+            dialog.setModal(true);
+            dialog.setTitle("Tu animal interior");
             dialog.getContentPane().add(panelLoading);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
@@ -184,25 +232,38 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
                         ResultSet rs = stmt.executeQuery();
                         
                         String specieName ="";
-                        URL imgURL=null;
+                        String imgURLString = "";
+                        
                         if(rs.next()){
                             specieName = rs.getString("name");
-                            imgURL = new URL("https://juanxxiiizoo.infinityfreeapp.com/"+rs.getString("img"));
+                            imgURLString = "https://juanxxiiizoo.infinityfreeapp.com/"+rs.getString("img");
                         }
                         String qr = "https://juanxxiiizoo.infinityfreeapp.com/img/qr_"+winnerID+".png";
                         URL qrURL = new URL(qr);
                         stmt.close();
                         rs.close();
                         
+                        //corrreccion de imagenes con espacio en el nombre
+                        String fixedImgUrl = imgURLString.replace(" ", "%20");
+                        URL imgURL = new URL(fixedImgUrl);
+                        
                         String title = "Tu animal interior es:";
                         JLabel titleLabel = new JLabel(title);
                         JLabel nameLabel = new JLabel(specieName);
                         ImageIcon specieIcon = new ImageIcon(imgURL);
                         Image img = specieIcon.getImage();
-                        if(specieIcon.getIconWidth() > 350){
-                            int newWidth = 350;
-                            int newHeight = (int) ((double)specieIcon.getIconHeight()*newWidth)/specieIcon.getIconWidth();
-                            img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                        if(specieIcon.getIconWidth() > specieIcon.getIconHeight()){
+                            if(specieIcon.getIconWidth() > 350){
+                                int newWidth = 350;
+                                int newHeight = (int) ((double)specieIcon.getIconHeight()*newWidth)/specieIcon.getIconWidth();
+                                img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                            }
+                        }else if(specieIcon.getIconWidth() < specieIcon.getIconHeight()){
+                            if(specieIcon.getIconHeight() > 240){
+                                int newHeight = 240;
+                                int newWidth = (specieIcon.getIconWidth() * newHeight) / specieIcon.getIconHeight();
+                                img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                            }
                         }
                         ImageIcon specieImg = new ImageIcon(img);
                         JLabel imgLabel = new JLabel(specieImg);
@@ -220,9 +281,18 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
                         qrLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-//                        panel.setPreferredSize(new Dimension(550, 700));
-//                        panel.setMinimumSize(new Dimension(550, 700));
-//                        panel.setMaximumSize(new Dimension(550, Short.MAX_VALUE));                                           
+
+                        //estilos para el resultado
+                        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+                        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 15));
+                        
+                        nameLabel.setFont(new Font("Arial", Font.BOLD, 26));
+                        nameLabel.setBorder(BorderFactory.createEmptyBorder(15,0,15,0));
+                        Color coffeBrown = new Color(101,67,33);
+                        nameLabel.setForeground(coffeBrown);
+                        
+                        textLabel.setBorder(BorderFactory.createEmptyBorder(15,0,15,0));
+                        textLabel.setFont(new Font("Arial", Font.PLAIN,20));
                         
                         panel.add(titleLabel);
                         panel.add(nameLabel);
