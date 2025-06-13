@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +44,10 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
      */
     public MiniZooMainMenu() {
         initComponents();
+//        Image image = new ImageIcon(getClass().getResource("/img/logoJXIII.png")).getImage();
+//
+//        // Establecer el icono
+//        setIconImage(image);
     }
 
     /**
@@ -59,7 +62,7 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnAction = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnAbout = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
 
@@ -67,11 +70,18 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
         setTitle("Que animal eres?");
         setResizable(false);
 
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(99, 34, 0));
         jLabel1.setText("¿Que animal eres?");
 
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(7, 30, 0));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Este programa te dira el animal que serias si volvieras a nacer.");
 
+        btnAction.setBackground(new java.awt.Color(23, 142, 24));
+        btnAction.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnAction.setForeground(java.awt.Color.white);
         btnAction.setText("Quiero saber!");
         btnAction.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,11 +89,24 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("?");
+        btnAbout.setBackground(java.awt.Color.lightGray);
+        btnAbout.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        btnAbout.setForeground(java.awt.Color.darkGray);
+        btnAbout.setText("?");
+        btnAbout.setBorderPainted(false);
+        btnAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAboutActionPerformed(evt);
+            }
+        });
 
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(7, 30, 0));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("No es ninguna mentira, utilizamos resultados basados en investigaciones cientificas.");
 
+        jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(7, 30, 0));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("PRUEBALO YA!!");
 
@@ -94,43 +117,45 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(199, 199, 199)
-                        .addComponent(jLabel1))
+                        .addGap(15, 15, 15)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(51, 51, 51)
+                                .addComponent(jLabel2))
+                            .addComponent(jLabel3)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(196, 196, 196)
+                                .addComponent(jLabel4))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(199, 199, 199)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnAction)
-                            .addComponent(jLabel4))))
+                        .addGap(201, 201, 201)
+                        .addComponent(btnAction)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 55, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(26, 26, 26))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(44, 44, 44))))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(94, 94, 94)
+                .addComponent(btnAbout)
+                .addGap(48, 48, 48))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(jButton2)
-                .addGap(31, 31, 31)
-                .addComponent(jLabel1)
-                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(52, 52, 52)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(btnAbout)))
+                .addGap(30, 30, 30)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel4)
-                .addGap(49, 49, 49)
-                .addComponent(btnAction)
-                .addContainerGap(85, Short.MAX_VALUE))
+                .addGap(27, 27, 27)
+                .addComponent(btnAction, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
@@ -164,7 +189,7 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
         dialogOpening.setLocationRelativeTo(null);
         dialogOpening.setVisible(true);
         
-        Timer cierreAutomatico = new Timer(1000, new ActionListener() {
+        Timer cierreAutomatico = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dialogOpening.dispose();
@@ -256,6 +281,10 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
                             if(specieIcon.getIconWidth() > 350){
                                 int newWidth = 350;
                                 int newHeight = (int) ((double)specieIcon.getIconHeight()*newWidth)/specieIcon.getIconWidth();
+                                if(newHeight > 240){
+                                    newHeight = 240;
+                                    newWidth = (specieIcon.getIconWidth() * newHeight) / specieIcon.getIconHeight();
+                                }
                                 img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
                             }
                         }else if(specieIcon.getIconWidth() < specieIcon.getIconHeight()){
@@ -324,10 +353,6 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
                         con.close();
                         
                         
-                        //me falta el codigo para mostrar el JOption Pane del resultado
-                        //primero mostrar una pantalla de carga
-                        //luego mostrar el resultado
-                        
                     }catch(SQLException e){
                         JOptionPane.showMessageDialog(rootPane,"Ha ocurrido un error en la segunda consulta","Error al leer en la base de datos",JOptionPane.ERROR_MESSAGE);
                     } catch (MalformedURLException ex) {
@@ -336,6 +361,18 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
                 }
             }
     }//GEN-LAST:event_btnActionActionPerformed
+
+    private void btnAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAboutActionPerformed
+        String message = "Hola, somos estudiantes de segundo año de la carrera "
+                + "Analisis de\nSistemas Informaticos de la UNAE, y este programa\n"
+                + "es parte de nuestro proyecto interdiciplinario denominado \n"
+                + "Mini-Zoo. El proyecto consisite en el desarrollo de un sitio web \n"
+                + "para el Mini-Zoo Juan XXIII, el cual cuenta con una base de datos de \n"
+                + "todas las especies que se encuentran en dicho zoo.\n"
+                + "Aprovechando estos datos, decidimos crear este programa utilizando java.\n"
+                + "Espero que te haya gustado :D";
+        JOptionPane.showMessageDialog(null, message,"Sobre el programa",JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_btnAboutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -375,8 +412,8 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAbout;
     private javax.swing.JButton btnAction;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
