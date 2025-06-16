@@ -4,35 +4,22 @@
  */
 package com.mycompany.mini.zoo;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 /**
  *
  * @author mierd
@@ -44,10 +31,10 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
      */
     public MiniZooMainMenu() {
         initComponents();
-//        Image image = new ImageIcon(getClass().getResource("/img/logoJXIII.png")).getImage();
-//
-//        // Establecer el icono
-//        setIconImage(image);
+        Image image = new ImageIcon(getClass().getResource("/images/logoJXIII.png")).getImage();
+
+        // Establecer el icono
+        setIconImage(image);
     }
 
     /**
@@ -162,216 +149,59 @@ public class MiniZooMainMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnActionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActionActionPerformed
-        String openingText = "Cargando...";
-        JLabel openingLabel = new JLabel(openingText);
-        openingLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        openingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        openingLabel.setVerticalAlignment(SwingConstants.CENTER);
+        LoadingScreen loading = new LoadingScreen();
         
-        //declaracion de los JPanel
-        JPanel panelOpening = new JPanel(new BorderLayout());
-        JPanel panelLoading = new JPanel();
-        JPanel panel = new JPanel();
-        
-        panelOpening.setPreferredSize(new Dimension(550, 600));
-        panelOpening.setMinimumSize(new Dimension(550, 600));
-        panelOpening.setMaximumSize(new Dimension(550, Short.MAX_VALUE));
-        
-        panelOpening.add(openingLabel, BorderLayout.CENTER);
-        
-        JDialog dialogOpening = new JDialog();
-        JDialog dialog = new JDialog();
-        
-        dialogOpening.setModal(false);
-        dialogOpening.setTitle("Tu animal interior");
-        dialogOpening.getContentPane().add(panelOpening);
-        dialogOpening.pack();
-        dialogOpening.setLocationRelativeTo(null);
-        dialogOpening.setVisible(true);
-        
-        Timer cierreAutomatico = new Timer(500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialogOpening.dispose();
+        new Thread(() -> {
+            try {
+                String[] data = Species.getRandomSpecie();
+                Thread.sleep(3000);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, new ResultScreen(data), "Resultado", JOptionPane.PLAIN_MESSAGE);
+                    loading.setVisible(false);             
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
-        cierreAutomatico.setRepeats(false); // Solo una vez
-        cierreAutomatico.start();
+        }).start();
         
-        try {
-            //buscar siluetas de animales y pedir a la IA una transicion con gif
-            String loadingText = "Analizando...";
-            JLabel loadingTextLabel = new JLabel(loadingText);
-            URL gifURL = new URL("https://juanxxiiizoo.infinityfreeapp.com/img/animalees.gif");
-            ImageIcon originalGif = new ImageIcon(gifURL);
-            JLabel loadingGifLabel = new JLabel(originalGif);
-            panelLoading.setLayout(new BoxLayout(panelLoading, BoxLayout.Y_AXIS));  
-            loadingTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            loadingGifLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            
-            //estilo para los labels
-            loadingTextLabel.setFont(new Font("Arial", Font.BOLD, 22));
-            loadingTextLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 15));
-            
-            //preparar ventana de carga
-            panelLoading.setPreferredSize(new Dimension(550, 600));
-            panelLoading.setMinimumSize(new Dimension(550, 600));
-            panelLoading.setMaximumSize(new Dimension(550, Short.MAX_VALUE));
-            
-            panelLoading.add(loadingTextLabel);
-            panelLoading.add(loadingGifLabel);
-            dialog.setModal(true);
-            dialog.setTitle("Tu animal interior");
-            dialog.getContentPane().add(panelLoading);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(MiniZooMainMenu.class.getName()).log(Level.SEVERE, null, ex);
-        }
-                    
-            Connection con = ConectionDB.connect();
-            ArrayList<Integer> species = new ArrayList();
-            if(con!=null){
-                try{
-                    String sql = "SELECT id FROM especies";
-                    Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery(sql);
-                    while(rs.next()){
-                        int id = rs.getInt("id");
-                        species.add(id);
-                    }
-                    rs.close();
-                    stmt.close();                    
-                }catch(SQLException e){
-                    JOptionPane.showMessageDialog(rootPane,"Ha ocurrido un error en la primera consulta","Error al leer en la base de datos",JOptionPane.ERROR_MESSAGE);
-                }
-                if(species.size() > 0){
-                    int length = species.size();
-                    int index = (int)Math.floor(Math.random()*length);
-                    int winnerID = species.get(index);
-                    try{
-                        String sql = "SELECT name,img FROM especies WHERE id = ?";
-                        PreparedStatement stmt = con.prepareStatement(sql);
-                        stmt.setInt(1, winnerID);
-                        ResultSet rs = stmt.executeQuery();
-                        
-                        String specieName ="";
-                        String imgURLString = "";
-                        
-                        if(rs.next()){
-                            specieName = rs.getString("name");
-                            imgURLString = "https://juanxxiiizoo.infinityfreeapp.com/"+rs.getString("img");
-                        }
-                        String qr = "https://juanxxiiizoo.infinityfreeapp.com/img/qr_"+winnerID+".png";
-                        URL qrURL = new URL(qr);
-                        stmt.close();
-                        rs.close();
-                        
-                        //corrreccion de imagenes con espacio en el nombre
-                        String fixedImgUrl = imgURLString.replace(" ", "%20");
-                        URL imgURL = new URL(fixedImgUrl);
-                        
-                        String title = "Tu animal interior es:";
-                        JLabel titleLabel = new JLabel(title);
-                        JLabel nameLabel = new JLabel(specieName);
-                        ImageIcon specieIcon = new ImageIcon(imgURL);
-                        Image img = specieIcon.getImage();
-                        if(specieIcon.getIconWidth() > specieIcon.getIconHeight()){
-                            if(specieIcon.getIconWidth() > 350){
-                                int newWidth = 350;
-                                int newHeight = (int) ((double)specieIcon.getIconHeight()*newWidth)/specieIcon.getIconWidth();
-                                if(newHeight > 240){
-                                    newHeight = 240;
-                                    newWidth = (specieIcon.getIconWidth() * newHeight) / specieIcon.getIconHeight();
-                                }
-                                img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-                            }
-                        }else if(specieIcon.getIconWidth() < specieIcon.getIconHeight()){
-                            if(specieIcon.getIconHeight() > 240){
-                                int newHeight = 240;
-                                int newWidth = (specieIcon.getIconWidth() * newHeight) / specieIcon.getIconHeight();
-                                img = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-                            }
-                        }
-                        ImageIcon specieImg = new ImageIcon(img);
-                        JLabel imgLabel = new JLabel(specieImg);
-                        String text = "Escanea el QR para obtener mas informacion";
-                        JLabel textLabel = new JLabel(text);
-                        ImageIcon specieQR = new ImageIcon(qrURL);
-                        Image resizedQR = specieQR.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-                        ImageIcon QR = new ImageIcon(resizedQR);
-                        JLabel qrLabel = new JLabel(QR);
-                        
-                        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                        imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                        qrLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-                        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-                        //estilos para el resultado
-                        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-                        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 15));
-                        
-                        nameLabel.setFont(new Font("Arial", Font.BOLD, 26));
-                        nameLabel.setBorder(BorderFactory.createEmptyBorder(15,0,15,0));
-                        Color coffeBrown = new Color(101,67,33);
-                        nameLabel.setForeground(coffeBrown);
-                        
-                        textLabel.setBorder(BorderFactory.createEmptyBorder(15,0,15,0));
-                        textLabel.setFont(new Font("Arial", Font.PLAIN,20));
-                        
-                        panel.add(titleLabel);
-                        panel.add(nameLabel);
-                        panel.add(imgLabel);
-                        panel.add(textLabel);
-                        panel.add(qrLabel);
-                        
-                        JScrollPane scroll = new JScrollPane(panel);
-                        scroll.setPreferredSize(new Dimension(550, 700));
-                        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                        
-                        new Thread(() -> {
-                            try {
-                                Thread.sleep(5000);
-                                SwingUtilities.invokeLater(() -> {
-                                    dialog.setVisible(false); 
-                                    
-                                    JOptionPane.showMessageDialog(null, scroll, "Resultado", JOptionPane.PLAIN_MESSAGE);
-                                });
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }).start();
-                        
-                        dialog.setVisible(true);
-                        
-                        
-                        con.close();
-                        
-                        
-                    }catch(SQLException e){
-                        JOptionPane.showMessageDialog(rootPane,"Ha ocurrido un error en la segunda consulta","Error al leer en la base de datos",JOptionPane.ERROR_MESSAGE);
-                    } catch (MalformedURLException ex) {
-                        Logger.getLogger(MiniZooMainMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
+        loading.setVisible(true);           
     }//GEN-LAST:event_btnActionActionPerformed
 
     private void btnAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAboutActionPerformed
-        String message = "Hola, somos estudiantes de segundo año de la carrera "
-                + "Analisis de\nSistemas Informaticos de la UNAE, y este programa\n"
-                + "es parte de nuestro proyecto interdiciplinario denominado \n"
-                + "Mini-Zoo. El proyecto consisite en el desarrollo de un sitio web \n"
-                + "para el Mini-Zoo Juan XXIII, el cual cuenta con una base de datos de \n"
-                + "todas las especies que se encuentran en dicho zoo.\n"
-                + "Aprovechando estos datos, decidimos crear este programa utilizando java.\n"
-                + "Espero que te haya gustado :D";
-        JOptionPane.showMessageDialog(null, message,"Sobre el programa",JOptionPane.INFORMATION_MESSAGE);
+        String message = "<html><body style=\"width=250px\"><p>Hola, somos estudiantes de segundo año de la carrera "
+                + "Analisis de Sistemas Informaticos de la <strong>UNAE</strong>, y este programa "
+                + "es parte de nuestro proyecto interdiciplinario denominado "
+                + "<strong>Mini-Zoo</strong>. El proyecto consisite en el desarrollo de un sitio web "
+                + "para el Mini-Zoo Juan XXIII, el cual cuenta con una base de datos de "
+                + "todas las especies que se encuentran en dicho zoo."
+                + "Aprovechando estos datos, decidimos crear este programa utilizando java."
+                + " Espero que te haya gustado :D</p>"
+                + "<p><strong>Escanea el QR para acceder al codigo fuente de este programa:</strong></p></body></html>";
+        String qr = "https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=https://github.com/MiguelBenitez5/minizooJavaProyect/tree/master";
+        URL qrURL = null;
+        try {
+            qrURL = new URL(qr);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MiniZooMainMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ImageIcon originalQR = new ImageIcon(qrURL);
+        Image resizedQR = originalQR.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        ImageIcon QR = new ImageIcon(resizedQR);
+        
+        JLabel msgLabel = new JLabel(message);
+        msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        msgLabel.setFont(new Font("Arial",Font.LAYOUT_LEFT_TO_RIGHT, 16));
+        JLabel qrLabel = new JLabel(QR);
+        qrLabel.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
+        qrLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(500,370));
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+        panel.add(msgLabel);
+        panel.add(qrLabel);
+        
+        JOptionPane.showMessageDialog(null, panel,"Sobre el programa",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnAboutActionPerformed
 
     /**
